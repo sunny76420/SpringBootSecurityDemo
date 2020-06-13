@@ -10,13 +10,14 @@ import org.springframework.stereotype.Repository;
 import com.example.demo.student.Student;
 
 @Repository("studentDao")
-public class StudentDataAccessService implements StudentDao{
-	
-	private static List<Student> studentList = new ArrayList<>(); 
+public class StudentDataAccessService implements StudentDao {
+
+	private static List<Student> studentList = new ArrayList<>();
 
 	@Override
 	public int addStudent(UUID studentId, Student student) {
-		studentList.add(new Student(studentId, student.getStudentName()));
+		studentList.add(new Student(studentId, student.getStudentName(), student.getClassName(), student.isFeePaid(),
+				student.getEmail(), student.getPhone()));
 		return 1;
 	}
 
@@ -27,27 +28,27 @@ public class StudentDataAccessService implements StudentDao{
 
 	@Override
 	public Optional<Student> selectStudentById(UUID studentId) {
-		return studentList.stream()
-				.filter(student -> student.getStudentId().equals(studentId)).findFirst();
+		return studentList.stream().filter(student -> student.getStudentId().equals(studentId)).findFirst();
 	}
 
 	@Override
 	public int deleteStudentById(UUID studentId) {
 		Optional<Student> studentOptional = selectStudentById(studentId);
-		if(!studentOptional.isPresent()) {
-		return 0;
-		}else {
+		if (!studentOptional.isPresent()) {
+			return 0;
+		} else {
 			studentList.remove(studentOptional.get());
 			return 1;
 		}
 	}
 
 	@Override
-	public int updateStudentById(UUID studentId, Student student) {
-		return selectStudentById(studentId).map(p -> {
+	public int updateStudentById(UUID studentId, Student studentToUpdate) {
+		return selectStudentById(studentId).map(student -> {
 			int indexOfStudentToUpdate = studentList.indexOf(student);
-			if(indexOfStudentToUpdate >= 0) {
-				studentList.set(indexOfStudentToUpdate, new Student(studentId, student.getStudentName()));
+			if (indexOfStudentToUpdate >= 0) {
+				studentList.set(indexOfStudentToUpdate, new Student(studentId, studentToUpdate.getStudentName(), studentToUpdate.getClassName(), studentToUpdate.isFeePaid(),
+						studentToUpdate.getEmail(), studentToUpdate.getPhone()));
 				return 1;
 			}
 			return 0;
