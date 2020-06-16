@@ -7,6 +7,7 @@ import javax.validation.Valid;
 //import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,26 +32,31 @@ public class StudentManagementController {
 	}
 	
 	@GetMapping
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_INSTRUCTOR')")
 	public List<Student> getAllStudents(){
 		return studentService.getAllStudent();
 	}
 	
 	@GetMapping(path="{studentId}")
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_INSTRUCTOR')")
 	public Student getStudentById(@PathVariable("studentId") UUID studentId) {
 		return studentService.getStudentById(studentId).orElseThrow(() -> new IllegalStateException("Student " + studentId + " does not exist"));
 	}
 	
 	@PostMapping
+	@PreAuthorize("hasAuthority('student:write')")
 	public void registerNewStudent(@Valid @RequestBody Student student) {
 		studentService.addStudent(student);
 	}
 	
 	@DeleteMapping(path = "{studentId}")
+	@PreAuthorize("hasAuthority('student:write')")
 	public void deleteStudent(@PathVariable("studentId") UUID studentId) {
 		studentService.deletePerson(studentId);
 	}
 	
 	@PutMapping(path = "{studentId}")
+	@PreAuthorize("hasAuthority('student:write')")
 	public void updateStudent(@PathVariable("studentId") UUID studentId, @Valid @RequestBody Student student) {
 		studentService.updateStudent(studentId, student);
 	}
